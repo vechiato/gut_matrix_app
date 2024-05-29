@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}
+Results
+{% endblock %}
+
+
+{% block content %}
+    <h1>Results</h1>
+    <h2>Topics</h2>
+    <ul>
+        <!-- Iterate over topics and render them -->
+        {% for topic in topics %}
+            <li><a href="/results?topic_id={{ topic.id }}">{{ topic.name }}</a></li>
+        {% endfor %}
+    </ul>
+    
+    <!-- Display selected topic and its items -->
+    {% if selected_topic %}
+        <h2>Items for {{ selected_topic.name }}</h2>
+        <ul>
+            {% for data in items_with_priority %}
+
+                <li>{{ data.item.name }} - Priority: {{ data.priority }}</li>
+            
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}
+Create Topic
+{% endblock %}
+
+{% block content %}
+    <h2>Create Topic</h2>
+    <h3>Add New Topic:</h3>
+    <form action="/create_topic" method="post">
+        <label>New Topic Name:</label><br>
+        <input type="text" name="name"><br><br>
+        <input type="submit" value="Add Topic">
+    </form>
+    <h3>Existing Topics:</h3>
+    <ul>
+        {% for topic in existing_topics %}
+            <li>{{ topic.name }}</li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
