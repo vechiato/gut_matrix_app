@@ -1,15 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Register</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}
+Register
+{% endblock %}
+
+{% block page_content %}
     <h2>Register</h2>
     <form method="post">
         {{ form.hidden_tag() }}
         <p>
             {{ form.email.label }}<br>
             {{ form.email(size=32) }}
+        </p>
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=32) }}
+        </p>
+        <p>
+            {{ form.team_code.label }}<br>
+            {{ form.team_code(size=32, value=team_code) }}
         </p>
         <p>
             {{ form.password.label }}<br>
@@ -19,7 +28,7 @@
             {{ form.password2.label }}<br>
             {{ form.password2(size=32) }}
         </p>
+
         <p>{{ form.submit() }}</p>
     </form>
-</body>
-</html>
+{% endblock %}

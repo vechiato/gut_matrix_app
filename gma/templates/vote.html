@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}
+Vote
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mt-4">Vote</h2>
+    <form method="get" action="/vote">
+        <div class="form-group">
+            <label for="topic_id">Topic:</label>
+            <select class="form-control" id="topic_id" name="topic_id" onchange="this.form.submit()">
+                {% for topic in topics %}
+                    <option value="{{ topic.id }}" {% if selected_topic and topic.id == selected_topic.id %}selected{% endif %}>
+                        {{ topic.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    {% if selected_topic %}
+        <h5>{{ selected_topic.name }} Items:</h5>
+        <form method="post">
+            <input type="hidden" name="topic_id" value="{{ selected_topic.id }}">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Gravity</th>
+                            <th>Urgency</th>
+                            <th>Tendency</th>
+                            <th>Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td>
+                                    <input type="number" class="form-control" name="gravity_{{ item.id }}" id="gravity_{{ item.id }}" min="1" max="5" value="{{ user_votes[item.id].gravity if item.id in user_votes else '' }}" onchange="calculatePriority({{ item.id }})">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" name="urgency_{{ item.id }}" id="urgency_{{ item.id }}" min="1" max="5" value="{{ user_votes[item.id].urgency if item.id in user_votes else '' }}" onchange="calculatePriority({{ item.id }})">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" name="tendency_{{ item.id }}" id="tendency_{{ item.id }}" min="1" max="5" value="{{ user_votes[item.id].tendency if item.id in user_votes else '' }}" onchange="calculatePriority({{ item.id }})">
+                                </td>
+                                <td>
+                                    <span id="priority_{{ item.id }}"></span>
+                                    <script>
+                                        // Calculate and display priority score on page load
+                                        calculatePriority({{ item.id }});
+                                    </script>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Votes</button>
+        </form>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Loop through each item to calculate and display priority score
+    {% for item in items %}
+        calculatePriority({{ item.id }});
+    {% endfor %}
+});
+
+function calculatePriority(itemId) {
+    var gravity = parseInt(document.getElementById('gravity_' + itemId).value) || 0;
+    var urgency = parseInt(document.getElementById('urgency_' + itemId).value) || 0;
+    var tendency = parseInt(document.getElementById('tendency_' + itemId).value) || 0;
+    var priority = gravity * urgency * tendency;
+    document.getElementById('priority_' + itemId).innerText = 'Priority: ' + priority;
+}
+</script>
+{% endblock %}

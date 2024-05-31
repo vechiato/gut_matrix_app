@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}
+Results
+{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <h2>Results</h2>
+    <div class="form-group">
+        <label for="topic-select">Topics</label>
+        <select id="topic-select" class="form-control">
+            <!-- Iterate over topics and render them as options -->
+            {% for topic in topics %}
+                <option value="{{ topic.id }}" {% if selected_topic and topic.id == selected_topic.id %}selected{% endif %}>
+                    {{ topic.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Display selected topic and its items -->
+    {% if selected_topic %}
+        <h5>{{ selected_topic.name }} Items by Priority:</h5>
+        <ul class="list-group">
+            {% for data in items_with_priority %}
+                <li class="list-group-item d-flex justify-content-between align-items-left">
+                    <span class="badge badge-primary badge-pill">Priority: {{ data.priority }}</span>
+                    <span class="badge badge-primary badge-pill">Votes: {{ data.votes_count }}</span>
+                    <span>{{ data.item.name }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const topicSelect = document.getElementById('topic-select');
+    topicSelect.addEventListener('change', function() {
+        const topicId = topicSelect.value;
+        window.location.href = `/results?topic_id=${topicId}`;
+    });
+});
+</script>
+{% endblock %}

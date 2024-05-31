@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Item
+{% endblock %}
+
+{% block page_content %}
+
+<h1>Edit Item</h1>
+<form action="{{ url_for('items.edit_item', item_id=item.id) }}" method="post">
+    <label for="name">Item Name:</label>
+    <input type="text" id="name" name="name" value="{{ item.name }}" required>
+    <input type="submit" value="Update">
+</form>
+<a href="{{ url_for('items.list_items') }}">Back to Items List</a>
+    </ul>
+{% endblock %}

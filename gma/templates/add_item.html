@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Item
+{% endblock %}
+
+{% block page_content %}
+<h2>Add Item</h2>
+<form id="add-item-form" action="/add_item" method="post">
+    <label>Topic:</label><br>
+    <select name="topic_id" id="topic-select">
+        {% for topic in topics %}
+            <option value="{{ topic.id }}">{{ topic.name }}</option>
+        {% endfor %}
+    </select><br><br>
+    <label>Item Name:</label><br>
+    <input type="text" name="name"><br><br>
+    <input type="submit" value="Add Item">
+</form>
+
+<h3>Current Items</h3>
+<ul id="items-list"></ul>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const topicSelect = document.getElementById('topic-select');
+    const itemsList = document.getElementById('items-list');
+    
+    function loadItems(topicId) {
+        fetch(`/get_items?topic_id=${topicId}`)
+            .then(response => response.json())
+            .then(data => {
+                itemsList.innerHTML = '';
+                data.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = `${item.name} (Priority: ${item.priority.toFixed(2)})`;
+                    itemsList.appendChild(li);
+                });
+            });
+    }
+
+    topicSelect.addEventListener('change', function() {
+        const topicId = topicSelect.value;
+        loadItems(topicId);
+    });
+
+    // Load items for the initially selected topic
+    loadItems(topicSelect.value);
+});
+</script>
+{% endblock %}

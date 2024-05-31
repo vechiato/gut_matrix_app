@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}
+List Topics
+{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <h1>Topics</h1>
+    <a class="btn btn-primary mb-3" href="{{ url_for('topics.create_topic') }}">Create New Topic</a>
+    <ul class="list-group">
+        {% for topic in existing_topics %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ topic.name }}</strong>
+                    <span class="badge badge-secondary">{{ topic.status }}</span>
+                </div>
+                <div>
+                    <button class="btn btn-secondary btn-sm" onclick="location.href='{{ url_for('topics.edit_topic', topic_id=topic.id) }}'">Edit</button>
+                    <form action="{{ url_for('topics.delete_topic', topic_id=topic.id) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                    <form action="{{ url_for('topics.list_topics') }}" method="post" style="display:inline;">
+                        <input type="hidden" name="topic_id" value="{{ topic.id }}">
+                        {% if topic.status == 'active' %}
+                            <input type="hidden" name="status" value="inactive">
+                            <button type="submit" class="btn btn-warning btn-sm">Deactivate</button>
+                        {% else %}
+                            <input type="hidden" name="status" value="active">
+                            <button type="submit" class="btn btn-success btn-sm">Activate</button>
+                        {% endif %}
+                    </form>
+                </div>
+            </li>
+        {% else %}
+            <li class="list-group-item">No topics available.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

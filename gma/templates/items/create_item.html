@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+Create Item
+{% endblock %}
+
+{% block page_content %}
+
+    <h3>Create New Item:</h3>
+    <form action="{{ url_for('items.create_item') }}" method="post">
+        <label for="name">Item Name:</label>
+        <input type="text" id="name" name="name" required>
+        <input type="submit" value="Create">
+    </form>
+    <h3>Existing Items:</h3>
+    <ul>
+        {% for item in items %}
+            <li>{{ item.name }}</li>
+        {% endfor %}
+    </ul> 
+
+{% endblock %}
+
+

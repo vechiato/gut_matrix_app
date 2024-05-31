@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Item
+{% endblock %}
+
+{% block page_content %}
+<h2>Items</h2>
+<!-- <a class="btn btn-primary mb-3" href="{{ url_for('items.create_item') }}">Create New Item</a> -->
+<form id="add-item-form" action="/items/create" method="post">
+    <label>Topic:</label><br>
+    <select name="topic_id" id="topic-select">
+        {% for topic in topics %}
+            <option value="{{ topic.id }}">{{ topic.name }}</option>
+        {% endfor %}
+    </select><br><br>
+    <label>Item Name:</label><br>
+    <input type="text" name="name"><br><br>
+    <input type="submit" value="Add Item">
+</form>
+
+<h4>Current Items:</h4>
+<ul id="items-list"></ul>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const topicSelect = document.getElementById('topic-select');
+        const itemsList = document.getElementById('items-list');
+        
+        function loadItems(topicId) {
+            fetch(`/items/get_items?topic_id=${topicId}`)
+                .then(response => response.json())
+                .then(data => {
+                    itemsList.innerHTML = '';
+                    const ul = document.createElement('ul');
+                    ul.className = 'list-group'; // Bootstrap class for list group
+                    
+                    data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+    
+                        // Create an edit button for the item
+                        const editButton = document.createElement('button');
+                        editButton.textContent = 'Edit';
+                        editButton.className = 'btn btn-primary btn-sm';
+                        editButton.addEventListener('click', function() {
+                            window.location.href = `/items/edit/${item.id}`;
+                        });
+                        li.appendChild(editButton);
+    
+                        // Create a delete button for the item
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Delete';
+                        deleteButton.className = 'btn btn-danger btn-sm';
+                        deleteButton.addEventListener('click', function() {
+                            fetch(`/items/delete/${item.id}`, {
+                                method: 'POST',
+                                credentials: 'same-origin',  // Include cookies in the request if the server is in the same origin
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    // Remove the item from the list if successfully deleted
+                                    li.remove();
+                                } else {
+                                    console.error('Error deleting item');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                        });
+                        li.appendChild(deleteButton);
+    
+                        // Add space between buttons and item name
+                        li.appendChild(document.createTextNode(' '));
+    
+                        // Add item name
+                        const itemNameSpan = document.createElement('span');
+                        itemNameSpan.textContent = `${item.name}`;
+                        li.appendChild(itemNameSpan);
+    
+                        // Append the list item to the unordered list
+                        ul.appendChild(li);
+                    });
+    
+                    // Append the unordered list to the items list container
+                    itemsList.appendChild(ul);
+                });
+        }
+    
+        topicSelect.addEventListener('change', function() {
+            const topicId = topicSelect.value;
+            loadItems(topicId);
+        });
+    
+        // Load items for the initially selected topic
+        loadItems(topicSelect.value);
+    });
+    </script>
+    
+    
+{% endblock %}

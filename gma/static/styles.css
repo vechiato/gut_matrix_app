@@ -35,3 +35,8 @@ ul {
 ul li {
     margin-bottom: 10px;
 }
+
+.badge-pill {
+    float: left; 
+    margin-right: 5px;
+}

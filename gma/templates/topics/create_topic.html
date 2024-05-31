@@ -4,13 +4,14 @@
 Create Topic
 {% endblock %}
 
-{% block content %}
-    <h2>Create Topic</h2>
+{% block page_content %}
+
+    <h2>Topics</h2>
     <h3>Add New Topic:</h3>
-    <form action="/create_topic" method="post">
-        <label>New Topic Name:</label><br>
-        <input type="text" name="name"><br><br>
-        <input type="submit" value="Add Topic">
+    <form action="{{ url_for('topics.create_topic') }}" method="post">
+        <label for="name">Topic Name:</label>
+        <input type="text" id="name" name="name" required>
+        <input type="submit" value="Create">
     </form>
     <h3>Existing Topics:</h3>
     <ul>
@@ -20,3 +21,5 @@ Create Topic
     </ul>
 
 {% endblock %}
+
+
