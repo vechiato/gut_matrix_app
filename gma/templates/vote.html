@@ -49,6 +49,9 @@ Vote
                                     <input type="number" class="form-control" name="tendency_{{ item.id }}" id="tendency_{{ item.id }}" min="1" max="5" value="{{ user_votes[item.id].tendency if item.id in user_votes else '' }}" onchange="calculatePriority({{ item.id }})">
                                 </td>
                                 <td>
+                                    <button type="button" class="btn btn-danger btn-sm delete-vote" data-item-id="{{ item.id }}">
+                                        <i class="fas fa-trash"></i>Delete
+                                    </button>
                                     <span id="priority_{{ item.id }}"></span>
                                     <script>
                                         // Calculate and display priority score on page load
@@ -66,19 +69,39 @@ Vote
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Loop through each item to calculate and display priority score
-    {% for item in items %}
-        calculatePriority({{ item.id }});
-    {% endfor %}
-});
+    document.addEventListener('DOMContentLoaded', function() {
+        // Loop through each item to calculate and display priority score
+        {% for item in items %}
+            calculatePriority({{ item.id }});
+        {% endfor %}
+    });
 
-function calculatePriority(itemId) {
-    var gravity = parseInt(document.getElementById('gravity_' + itemId).value) || 0;
-    var urgency = parseInt(document.getElementById('urgency_' + itemId).value) || 0;
-    var tendency = parseInt(document.getElementById('tendency_' + itemId).value) || 0;
-    var priority = gravity * urgency * tendency;
-    document.getElementById('priority_' + itemId).innerText = 'Priority: ' + priority;
-}
+    function calculatePriority(itemId) {
+        var gravity = parseInt(document.getElementById('gravity_' + itemId).value) || 0;
+        var urgency = parseInt(document.getElementById('urgency_' + itemId).value) || 0;
+        var tendency = parseInt(document.getElementById('tendency_' + itemId).value) || 0;
+        var priority = gravity * urgency * tendency;
+        document.getElementById('priority_' + itemId).innerText = 'Priority: ' + priority;
+    }
+
+    // Event listener for delete vote buttons
+    document.querySelectorAll('.delete-vote').forEach(button => {
+        button.addEventListener('click', function() {
+            const itemId = this.getAttribute('data-item-id');
+            if (confirm('Are you sure you want to delete your vote for this item?')) {
+                fetch(`/delete_vote?item_id=${itemId}`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Reload the page or update the UI to reflect the deleted vote
+                            location.reload();
+                        } else {
+                            alert('Failed to delete vote. Please try again.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+    });
 </script>
 {% endblock %}

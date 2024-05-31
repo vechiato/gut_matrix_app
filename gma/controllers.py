@@ -68,38 +68,6 @@ def qr_code():
     qr_code_img.seek(0)
     return Response(qr_code_img, mimetype='image/png')
 
-
-# @bp.route("/add_item", methods=["GET", "POST"])
-# @login_required
-# def add_item():
-#     if request.method == "POST":
-#         topic_id = request.form.get("topic_id")
-#         name = request.form.get("name")
-        
-#         # Create a new item
-#         item = Item(name=name, topic_id=topic_id)
-#         db.session.add(item)
-#         db.session.commit()
-        
-#         # After adding the item, reload the page
-#         return redirect(url_for('controllers.add_item'))
-
-#     topics = Topic.query.all()
-#     return render_template("add_item.html", topics=topics)
-
-# @bp.route("/get_items")
-# @login_required
-# def get_items():
-#     topic_id = request.args.get('topic_id')
-#     items = Item.query.filter_by(topic_id=topic_id).all()
-    
-#     # Calculate priorities and sort items
-#     items_with_priority = [(item, item.calculate_priority()) for item in items]
-#     sorted_items = sorted(items_with_priority, key=lambda x: x[1], reverse=True)
-    
-#     items_data = [{'id': item.id, 'name': item.name, 'priority': priority} for item, priority in sorted_items]
-    return jsonify(items_data)
-
 @bp.route('/vote', methods=['GET', 'POST'])
 @login_required
 def vote():
@@ -123,14 +91,10 @@ def vote():
 
     items = []
     user_votes = {}
-    items_with_vote_count = []
 
     if selected_topic:
         items = Item.query.filter_by(topic_id=selected_topic.id).all()
         for item in items:
-            votes_count = Vote.query.filter_by(item_id=item.id).count()
-            items_with_vote_count.append({'item': item, 'votes_count': votes_count})
-
             user_vote = Vote.query.filter_by(user_id=current_user.id, item_id=item.id).first()
             if user_vote:
                 user_votes[item.id] = user_vote
@@ -153,15 +117,18 @@ def vote():
         db.session.commit()
         return redirect(url_for('controllers.vote', topic_id=topic_id))
 
-    return render_template('vote.html', topics=topics, selected_topic=selected_topic, items=items, 
-                           user_votes=user_votes, items_with_vote_count=items_with_vote_count)
+    return render_template('vote.html', topics=topics, selected_topic=selected_topic, items=items, user_votes=user_votes)
 
-
-@bp.route("/generate_qr_code")
+@bp.route('/delete_vote', methods=['POST'])
 @login_required
-def generate_qr_code():
-    # Implementation
-    pass
+def delete_vote():
+    item_id = request.args.get('item_id', type=int)
+    vote = Vote.query.filter_by(user_id=current_user.id, item_id=item_id).first()
+    if vote:
+        db.session.delete(vote)
+        db.session.commit()
+        return jsonify(success=True)
+    return jsonify(success=False)
 
 @bp.route("/calculate")
 @login_required
@@ -228,5 +195,10 @@ def results():
         
         # Sort items by priority in descending order
         items_with_priority.sort(key=lambda x: x['priority'], reverse=True)
+        for rank, item in enumerate(items_with_priority, start=1):
+            item['rank'] = rank
+        print(items_with_priority)
 
     return render_template('results.html', topics=team_topics, selected_topic=selected_topic, items_with_priority=items_with_priority)
+
+

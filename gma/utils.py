@@ -4,23 +4,23 @@ from flask_login import current_user
 
 def calculate_priority(item):
     votes = Vote.query.filter_by(item_id=item.id).all()
+    votes_count = len(votes)
+    
+    if votes_count == 0:
+        return 0
+    
     total_gravity = sum(vote.gravity for vote in votes)
     total_urgency = sum(vote.urgency for vote in votes)
     total_tendency = sum(vote.tendency for vote in votes)
-    priority = total_gravity * total_urgency * total_tendency
+    
+    # Calculate average priority
+    average_gravity = total_gravity / votes_count
+    average_urgency = total_urgency / votes_count
+    average_tendency = total_tendency / votes_count
+    
+    priority = average_gravity * average_urgency * average_tendency
+
+    print(votes_count, total_gravity, total_urgency, total_tendency, priority)    
+
     return priority
 
-
-from functools import wraps
-from flask import abort
-
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        team_id = kwargs.get('team_id')
-        team_user = TeamUser.query.filter_by(user_id=current_user.id, team_id=team_id).first()
-        print(current_user.id, team_id, team_user)#, team_user.role)#, team_user.role)
-        if not team_user or team_user.role != 'admin':
-            abort(403)
-        return f(*args, **kwargs)
-    return decorated_function

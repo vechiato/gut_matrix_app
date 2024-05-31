@@ -1,8 +1,7 @@
 # gma/items.py
 from flask import Blueprint, flash, render_template, request, redirect, url_for, jsonify
 from flask_login import login_required, current_user
-from gma.models import User, Topic, Item, Vote, Team, TeamUser, db
-from gma.utils import admin_required    
+from gma.models import User, Topic, Item, Vote, Team, TeamUser, db  
 
 bp = Blueprint('items', __name__, url_prefix='/items')
 
@@ -10,7 +9,13 @@ bp = Blueprint('items', __name__, url_prefix='/items')
 @login_required
 def list_items():
     # Fetch all existing items for my team
-    team_topics = Topic.query.join(TeamUser, Topic.team_id == TeamUser.team_id).filter(TeamUser.user_id == current_user.id).all()
+    #team_topics = Topic.query.join(TeamUser, Topic.team_id == TeamUser.team_id).filter(TeamUser.user_id == current_user.id).all()
+    # Fetch active topics belonging to the user's teams that have items
+    team_topics = (Topic.query
+              .join(TeamUser, Topic.team_id == TeamUser.team_id)
+              .filter(TeamUser.user_id == current_user.id, Topic.status == 'active')
+              .order_by(Topic.created_at.desc())
+              .all())
 
     existing_topics = Topic.query.all()
     return render_template("items/list_items.html", topics=team_topics)

@@ -19,28 +19,40 @@ Results
         </select>
     </div>
 
-    <!-- Display selected topic and its items -->
     {% if selected_topic %}
-        <h5>{{ selected_topic.name }} Items by Priority:</h5>
-        <ul class="list-group">
-            {% for data in items_with_priority %}
-                <li class="list-group-item d-flex justify-content-between align-items-left">
-                    <span class="badge badge-primary badge-pill">Priority: {{ data.priority }}</span>
-                    <span class="badge badge-primary badge-pill">Votes: {{ data.votes_count }}</span>
-                    <span>{{ data.item.name }}</span>
-                </li>
-            {% endfor %}
-        </ul>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Item</th>
+                        <th>Priority</th>
+                        <th>Votes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in items_with_priority %}
+                        <tr>
+                            <td>{{ data.rank }}</td>
+                            <td>{{ data.item.name }}</td>
+                            <td>{{ data.priority | round(2) }}</td>
+                            <td>{{ data.votes_count }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% endif %}
 </div>
 
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const topicSelect = document.getElementById('topic-select');
-    topicSelect.addEventListener('change', function() {
-        const topicId = topicSelect.value;
-        window.location.href = `/results?topic_id=${topicId}`;
+    document.addEventListener('DOMContentLoaded', function() {
+        const topicSelect = document.getElementById('topic-select');
+        topicSelect.addEventListener('change', function() {
+            const topicId = topicSelect.value;
+            window.location.href = `/results?topic_id=${topicId}`;
+        });
     });
-});
 </script>
 {% endblock %}
