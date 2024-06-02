@@ -14,6 +14,7 @@ bp = Blueprint('controllers', __name__)
 def index():
     user_count = User.query.count()
     my_team_count = 0
+    team_count = Team.query.count()
     topic_count = Topic.query.count()
     item_count = Item.query.count()
     vote_count = Vote.query.count()
@@ -43,8 +44,14 @@ def index():
             img.save(qr_code_img)
             qr_code_img.seek(0)
 
-    return render_template('index.html', user_count=user_count, topic_count=topic_count, item_count=item_count, 
-                           vote_count=vote_count, team_code=team_code, qr_code_img=qr_code_img, my_team_count=my_team_count)
+    return render_template('index.html', user_count=user_count, 
+                           topic_count=topic_count, 
+                           item_count=item_count, 
+                           team_count=team_count,
+                           vote_count=vote_count, 
+                           team_code=team_code, 
+                           qr_code_img=qr_code_img, 
+                           my_team_count=my_team_count)
 
 @bp.route("/qr_code")
 def qr_code():
@@ -167,9 +174,6 @@ def calculate():
 def results():
     topic_id = request.args.get('topic_id')
 
-    # Fetch topics belonging to the user's teams
-    team_topics = Topic.query.join(TeamUser, Topic.team_id == TeamUser.team_id).filter(TeamUser.user_id == current_user.id).order_by(Topic.created_at.desc()).all()
-
     # Fetch topics belonging to the user's teams that have items
     team_topics = (Topic.query
               .join(TeamUser, Topic.team_id == TeamUser.team_id)
@@ -185,19 +189,21 @@ def results():
     else:
         selected_topic = team_topics[0] if team_topics else None
 
+    print(selected_topic.items)
+
     if selected_topic:
-        # Fetch items for the selected topic along with their priority and votes count
-        items = selected_topic.items
+        # Fetch items for the selected topic along with their priority and votes count excluding inactive items
+        items = [item for item in selected_topic.items if item.status == 'active']
+
         for item in items:
             votes_count = db.session.query(func.count(Vote.id)).filter_by(item_id=item.id).scalar()
-            priority = calculate_priority(item)  # Assuming you have a function to calculate priority
+            priority = calculate_priority(item) 
             items_with_priority.append({'item': item, 'votes_count': votes_count, 'priority': priority})
         
         # Sort items by priority in descending order
         items_with_priority.sort(key=lambda x: x['priority'], reverse=True)
         for rank, item in enumerate(items_with_priority, start=1):
             item['rank'] = rank
-        print(items_with_priority)
 
     return render_template('results.html', topics=team_topics, selected_topic=selected_topic, items_with_priority=items_with_priority)
 

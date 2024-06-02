@@ -11,8 +11,9 @@ class Team(db.Model):
     team_code = db.Column(db.String(6), unique=True, nullable=False, default=lambda: ''.join(random.choices(string.ascii_letters + string.digits, k=6)))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    users = db.relationship('User', secondary='team_user', back_populates='teams')
+    #users = db.relationship('User', secondary='team_user', back_populates='teams')
     topics = db.relationship('Topic', backref='team', lazy=True)
+    team_users = db.relationship('TeamUser', back_populates='team')
 
 class TeamUser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,7 +22,13 @@ class TeamUser(db.Model):
     role = db.Column(db.String(50), default='regular' , nullable=False)  # 'admin' or 'regular'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def role(self, role):
+    user = db.relationship('User', back_populates='team_users') 
+    team = db.relationship('Team', back_populates='team_users') 
+
+    # def team(self, team):
+    #     return '<Team %r>' % team
+
+    def get_role(self, role):
         return '<Role %r>' % role
 
     __table_args__ = (db.UniqueConstraint('user_id', 'team_id', name='_user_team_uc'),)
@@ -33,7 +40,8 @@ class User(db.Model, UserMixin):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     password_hash = db.Column(db.String(128), nullable=False)
 
-    teams = db.relationship('Team', secondary='team_user', back_populates='users')
+    #teams = db.relationship('Team', secondary='team_user', back_populates='users')
+    team_users = db.relationship('TeamUser', back_populates='user')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -56,6 +64,7 @@ class Topic(db.Model):
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
+    status = db.Column(db.String(50), default='active' , nullable=False)  # 'active' or 'inactive'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     topic_id = db.Column(db.Integer, db.ForeignKey('topic.id'), nullable=False)
  
@@ -64,7 +73,6 @@ class Item(db.Model):
         urgency_sum = sum(vote.urgency for vote in self.votes)
         tendency_sum = sum(vote.tendency for vote in self.votes)
         
-        # Assuming we want to use the average of votes for the priority calculation
         vote_count = len(self.votes)
         if vote_count == 0:
             return 0

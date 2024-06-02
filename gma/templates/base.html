@@ -6,9 +6,9 @@
 <!-- Bootstrap CSS -->
 <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
 <!-- Font Awesome CSS -->
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <!-- Custom CSS -->
-<!-- <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> -->
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 {{ super() }}
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
@@ -29,6 +29,9 @@
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li><a href="{{ url_for('controllers.index') }}">Home</a></li>
+                <!-- WIP
+                <li><a href="{{ url_for('users_teams.manage_users_teams') }}">Teams</a></li>
+                -->
                 <li><a href="{{ url_for('topics.list_topics') }}">Topics</a></li>
                 <li><a href="{{ url_for('items.list_items') }}">Items</a></li>
                 <li class="nav-item"><a class="nav-link" href="/vote">Vote</a></li>
@@ -37,11 +40,13 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated %}
-                <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
+                    <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
                 {% else %}
-                <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
+                    <li><a href="{{ url_for('auth.register') }}">Sign In</a></li>
+                    <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
                 {% endif %}
             </ul>
+            
         </div>
     </div>
 </div>

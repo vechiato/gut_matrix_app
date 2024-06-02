@@ -25,11 +25,12 @@ def create_app():
     bootstrap.init_app(app)
     moment.init_app(app)
     
-    from . import controllers, models, auth, utils, topics, items
+    from . import controllers, models, auth, utils, topics, items, users_teams
     app.register_blueprint(controllers.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(topics.bp)
     app.register_blueprint(items.bp)
+    app.register_blueprint(users_teams.bp)
     
     # Configure login view for login required decorator
     login_manager.login_view = 'auth.login'

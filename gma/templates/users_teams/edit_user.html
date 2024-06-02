@@ -1,0 +1,21 @@
+<!-- templates/users_teams/edit_user.html -->
+
+{% extends "base.html" %}
+
+{% block title %}
+Edit User
+{% endblock %}
+
+{% block page_content %}
+<h2>Edit User</h2>
+
+<form action="{{ url_for('users_teams.edit_user', user_id=user.id) }}" method="post">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" value="{{ user.username }}" required><br><br>
+    
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" value="{{ user.email }}" required><br><br>
+    
+    <button type="submit">Save Changes</button>
+</form>
+{% endblock %}

@@ -5,8 +5,8 @@ A collaborative GUT Matrix web application to prioritize items based on Gravity,
 
 ## Features
 - User Authentication
-- Create and manage GUT Topics
-- Collaborative voting using the GUT Matrix
+- Create and manage GUT Topics and Items
+- Collaborative voting
 - Real-time updates 
 - Data visualization
 - Export options (future)
@@ -41,8 +41,10 @@ A collaborative GUT Matrix web application to prioritize items based on Gravity,
 
 4. Set up the database
     ```bash
-    export FLASH_APP=run.py
+    export FLASH_APP=gma.py
     export FLASH_DEBUG=1
+    export FLASK_RUN_PORT="5000" 
+    export FLASK_RUN_HOST="0.0.0.0"
 
     flask db init
     flask db migrate 
@@ -59,10 +61,3 @@ A collaborative GUT Matrix web application to prioritize items based on Gravity,
 - Create and manage GUT topics an items.
 - Invite people to your team.
 - Vote on items and view results.
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request.
-License
-
-This project is licensed under the MIT License.

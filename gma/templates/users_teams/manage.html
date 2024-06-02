@@ -1,0 +1,96 @@
+<!-- templates/users_teams/manage.html -->
+
+{% extends "base.html" %}
+
+{% block title %}
+Manage Users and Teams
+{% endblock %}
+
+{% block page_content %}
+<h2>Manage Users and Teams - {{ current_user.username }} - admin:{{ is_admin }}</h2>
+
+{% if is_admin %}
+<div>
+    <a class="btn btn-success" href="{{ url_for('users_teams.create_team') }}">Create New Team</a>
+</div>
+{% endif %}
+
+
+{% if is_admin %}
+    <h3>Users you can manage</h3>
+    <ul>
+        {% for user in manageable_users %}
+        <li>
+            {{ user.username }} ({{ user.email }}) role {{ user.role }}
+            <form action="{{ url_for('users_teams.remove_user', user_id=user.id) }}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to remove this user?');">
+                    <i class="fas fa-trash-alt"></i> Remove from team
+                </button>
+            </form>
+            <form action="{{ url_for('users_teams.edit_user', user_id=user.id) }}" method="get" style="display:inline;">
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <button type="submit" name="action" value="edit" class="btn btn-sm btn-primary">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+{% for user in manageable_users %}
+    <ul>
+    <li>
+        {{ user.username }} ({{ user.email }}) role {{ user.role}}
+        <form action="{{ url_for('users_teams.remove_user', user_id=user.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to remove this user?');">
+                <i class="fas fa-trash-alt"></i> Remove from team
+            </button>
+        </form>
+        <form action="{{ url_for('users_teams.edit_user', user_id=user.id) }}" method="get" style="display:inline;">
+            <input type="hidden" name="user_id" value="{{ user.id }}">
+            <button type="submit" name="action" value="edit" class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i> Edit
+            </button>
+        </form>
+    </li>
+    </ul>
+    {% endfor %}
+{% endif %}
+
+<h3>Teams you belong to</h3>
+{% if admin_teams or regular_teams %}
+    {% if admin_teams %}
+        <h4>Teams you manage</h4>
+        <ul>
+        {% for team in admin_teams %}
+            <li>{{ team.name }} {{ team.team_code}} </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    
+    {% if regular_teams %}
+        <h4>Teams you are a member of</h4>
+        <ul>
+        {% for team in regular_teams %}
+            <li>{{ team.name }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% else %}
+    <p>You do not belong to any teams.</p>
+{% endif %}
+
+<h3>All Users</h3>
+<ul>
+{% for user in users %}
+    <li>{{ user.username }} ({{ user.email }})</li>
+{% endfor %}
+</ul>
+
+<h3>All Teams</h3>
+<ul>
+{% for team in teams %}
+    <li>{{ team.name }} {{ team.team_code}}</li>
+{% endfor %}
+</ul>
+{% endblock %}

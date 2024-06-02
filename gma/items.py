@@ -5,11 +5,9 @@ from gma.models import User, Topic, Item, Vote, Team, TeamUser, db
 
 bp = Blueprint('items', __name__, url_prefix='/items')
 
-@bp.route("/", methods=["GET"])
+@bp.route("/", methods=["GET", "POST"])
 @login_required
 def list_items():
-    # Fetch all existing items for my team
-    #team_topics = Topic.query.join(TeamUser, Topic.team_id == TeamUser.team_id).filter(TeamUser.user_id == current_user.id).all()
     # Fetch active topics belonging to the user's teams that have items
     team_topics = (Topic.query
               .join(TeamUser, Topic.team_id == TeamUser.team_id)
@@ -17,7 +15,15 @@ def list_items():
               .order_by(Topic.created_at.desc())
               .all())
 
-    existing_topics = Topic.query.all()
+    if request.method == 'POST':
+        item_id = request.form.get('item_id')
+        new_status = request.form.get('status')
+        item = Item.query.get(item_id)
+        if item:
+            item.status = new_status
+            db.session.commit()
+            return redirect(url_for('items.list_items'))
+
     return render_template("items/list_items.html", topics=team_topics)
 
 @bp.route("/get_items")
@@ -30,7 +36,8 @@ def get_items():
     items_with_priority = [(item, item.calculate_priority()) for item in items]
     sorted_items = sorted(items_with_priority, key=lambda x: x[1], reverse=True)
     
-    items_data = [{'id': item.id, 'name': item.name, 'priority': priority} for item, priority in sorted_items]
+    items_data = [{'id': item.id, 'name': item.name, 'status': item.status, 'priority': priority} for item, priority in sorted_items]
+
     return jsonify(items_data)
 
 @bp.route("/create", methods=["GET", "POST"])

@@ -20,7 +20,7 @@ def calculate_priority(item):
     
     priority = average_gravity * average_urgency * average_tendency
 
-    print(votes_count, total_gravity, total_urgency, total_tendency, priority)    
+    #print(votes_count, total_gravity, total_urgency, total_tendency, priority)    
 
     return priority
 
